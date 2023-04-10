@@ -91,23 +91,16 @@ class Clock(tk.Frame):
         self.clock_frame.pack_propagate(False)
 
         # clock time
-        # """24hr format""" self.current_time = datetime.now().strftime("%H:%M")
-        #self.current_time = datetime.datetime.now().time().strftime("%I:%M %p") # %p is for am/pm
-
-        def time():
-            current_time = datetime.datetime.now().time().strftime("%H:%M:%S %p")
-            self.clock_time.config(text=current_time)
-            self.clock_time.after(1000, time)
-        
         self.clock_time = tk.Label(
             master=self.clock_frame,
             font=(self.clock_font, self.time_font_size))
         self.clock_time.pack(side=tk.LEFT)
-
-        time()
-
-    def time_now(): # returns a tuple time and isAm -> T/F
-        return 
+        self.time_now()
+    
+    def time_now(self):
+        current_time = datetime.datetime.now().time().strftime("%H:%M:%S %p")
+        self.clock_time.config(text=current_time)
+        self.clock_time.after(200, self.time_now)
 
 
 if __name__ == "__main__":
