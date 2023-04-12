@@ -10,7 +10,7 @@ class DigitalClockFrame():
         self.parent = parent
 
         self.parent.title("Digital Clock App")
-        self.parent.geometry('250x150') #x,y
+        self.parent.geometry('325x150') #x,y
         self.parent.resizable(False, False) #x,y
         
         # Digital clock face is contained here
@@ -43,10 +43,11 @@ class DigitalClockFrame():
         self.left_btn.pack(side=tk.LEFT, fill=tk.BOTH)
 
         # TODO: insert the utility frame here ==========================
-        Clock(self.mid_row)
+        #Clock(self.mid_row)
+        Stopwatch(self.mid_row)
 
         # will be used to house a cycling button
-        self.right_column = tk.Frame(master=self.mid_row, width=20)
+        self.right_column = tk.Frame(master=self.mid_row, width=20, bg="blue")
         self.right_column.pack(fill=tk.Y, side=tk.RIGHT)
         self.right_column.pack_propagate(False)
         
@@ -82,10 +83,8 @@ class Clock(tk.Frame):
         self.overall_font = 0
         self.clock_font = "Arial" # placeholder
         self.time_font_size = 35
-        self.am_pm_font_size = 20
-        self.isAm = True
 
-        # holds the actual clock display (numbers + am/pm)
+        # holds the actual clock display
         self.clock_frame = tk.Frame(master=container)
         self.clock_frame.pack(fill=tk.BOTH, side=tk.LEFT, expand=True)
         self.clock_frame.pack_propagate(False)
@@ -102,6 +101,64 @@ class Clock(tk.Frame):
         self.clock_time.config(text=current_time)
         self.clock_time.after(200, self.time_now)
 
+class Stopwatch(tk.Frame):
+    def __init__(self, container):
+        super().__init__(container)
+
+        # TODO: move settings out of here
+        self.clock_font = "Arial" # placeholder
+
+        # stopwatch state
+        self.is_running = False
+        self.is_start_active = True
+        self.is_stop_active = False
+        self.is_clear_active = False
+
+        self.time_font_size = 35
+        self.time_counter = 28800 #66600 # Why does time not start at 0? for me it starts at 16 hrs
+        self.day_in_seconds = 86400 # 60*60*24
+
+        # area to display
+        self.stopwatch_frame = tk.Frame(master=container)
+        self.stopwatch_frame.pack(fill=tk.BOTH, side=tk.LEFT, expand=True)
+        self.stopwatch_frame.pack_propagate(False)
+
+        # elapsed time display
+        self.stopwatch_lbl = tk.Label(
+            master=self.stopwatch_frame,
+            font=(self.clock_font, self.time_font_size))
+        self.stopwatch_lbl.pack(side=tk.LEFT)
+        self.display_counter()
+
+        self.control_btns_frame = tk.Frame(master=self.stopwatch_frame)
+        self.control_btns_frame.pack(side=tk.RIGHT)
+
+        # start button
+        self.start_btn = tk.Button(
+            master=self.control_btns_frame,
+            text="Start",
+            bg="green")
+        self.start_btn.pack(fill=tk.X, side=tk.TOP)
+        # end button
+        self.stop_btn = tk.Button(
+            master=self.control_btns_frame,
+            text="Stop",
+            bg="red")
+        self.stop_btn.pack(fill=tk.X, side=tk.TOP)
+        # clear button
+        self.clear_btn = tk.Button(
+            master=self.control_btns_frame,
+            text="Clear")
+        self.clear_btn.pack(fill=tk.X, side=tk.BOTTOM)
+
+    def display_counter(self):
+        elapsed_time = datetime.datetime.fromtimestamp(self.time_counter)
+        elapsed_time_str = elapsed_time.strftime("%H:%M:%S")
+        self.stopwatch_lbl.config(text=elapsed_time_str)
+
+        if self.is_running:
+            self.stopwatch_lbl.after(1000, self.display_counter) # calls the function again
+            self.time_counter += 1
 
 if __name__ == "__main__":
     app = tk.Tk()
