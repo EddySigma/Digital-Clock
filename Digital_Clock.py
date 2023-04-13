@@ -137,18 +137,25 @@ class Stopwatch(tk.Frame):
         self.start_btn = tk.Button(
             master=self.control_btns_frame,
             text="Start",
-            bg="green")
+            bg="green",
+            command=self.start_click)
         self.start_btn.pack(fill=tk.X, side=tk.TOP)
-        # end button
+
+        # stop button
         self.stop_btn = tk.Button(
             master=self.control_btns_frame,
             text="Stop",
-            bg="red")
+            bg="red",
+            state='disabled',
+            command=self.stop_click)
         self.stop_btn.pack(fill=tk.X, side=tk.TOP)
+
         # clear button
         self.clear_btn = tk.Button(
             master=self.control_btns_frame,
-            text="Clear")
+            text="Clear",
+            state='disabled',
+            command=self.clear_click)
         self.clear_btn.pack(fill=tk.X, side=tk.BOTTOM)
 
     def display_counter(self):
@@ -160,6 +167,26 @@ class Stopwatch(tk.Frame):
             self.stopwatch_lbl.after(1000, self.display_counter) # calls the function again
             self.time_counter += 1
 
+    def start_click(self):
+        self.is_running = True
+        self.display_counter()
+        self.start_btn['state'] = 'disabled'
+        self.stop_btn['state'] = 'normal'
+        self.clear_btn['state'] = 'normal'
+
+    def stop_click(self):
+        self.is_running = False
+        self.start_btn['state'] = 'normal'
+        self.stop_btn['state'] = 'disabled'
+
+    def clear_click(self):
+        self.is_running = False
+        self.time_counter = 28800
+        self.display_counter()
+        self.start_btn['state'] = 'normal'
+        self.stop_btn['state'] = 'disabled'
+        self.clear_btn['state'] = 'disabled'
+        
 if __name__ == "__main__":
     app = tk.Tk()
     DigitalClockFrame(app)
