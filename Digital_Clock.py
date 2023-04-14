@@ -44,7 +44,8 @@ class DigitalClockFrame():
 
         # TODO: insert the utility frame here ==========================
         #Clock(self.mid_row)
-        Stopwatch(self.mid_row)
+        #Stopwatch(self.mid_row)
+        Timer(self.mid_row)
 
         # will be used to house a cycling button
         self.right_column = tk.Frame(master=self.mid_row, width=20, bg="blue")
@@ -164,7 +165,12 @@ class Stopwatch(tk.Frame):
         self.stopwatch_lbl.config(text=elapsed_time_str)
 
         if self.is_running:
-            self.stopwatch_lbl.after(1000, self.display_counter) # calls the function again
+            """ Something to look into. Due to the time set to 1000 milisecs when stop gets
+            clicked the timer will wait until the second finishes. Is there a way to make this
+            a little more seemless? I tried looking into displaying 10ths or 100ths of a second
+            but I could not find much only microseconds and that is very much overkill for this.
+            """
+            self.stopwatch_lbl.after(1000, self.display_counter)
             self.time_counter += 1
 
     def start_click(self):
@@ -186,7 +192,40 @@ class Stopwatch(tk.Frame):
         self.start_btn['state'] = 'normal'
         self.stop_btn['state'] = 'disabled'
         self.clear_btn['state'] = 'disabled'
+
+class Timer(tk.Frame):
+    def __init__(self, container):
+        super().__init__(container)
+        # holder for everything
+        self.timer_frame = tk.Frame(master=container)
+        self.timer_frame.pack(fill=tk.BOTH, side=tk.LEFT, expand=True)
+        self.timer_frame.pack_propagate(False)
+
+        # top row of buttons to increase time in h/m/s
+        self.inc_hour = tk.Button(master=self.timer_frame, text='^').grid(column=0, row=0) # inc -> increase
+        self.inc_minute = tk.Button(master=self.timer_frame).grid(column=2, row=0)
+        self.inc_second = tk.Button(master=self.timer_frame).grid(column=4, row=0)
+
+        # label row to inform user of hh:mm:ss
+        self.hour_lbl = tk.Label(master=self.timer_frame, text="Hour").grid(column=0, row=1)
+        self.minute_lbl = tk.Label(master=self.timer_frame, text="Minute").grid(column=2, row=1)
+        self.second_lbl = tk.Label(master=self.timer_frame, text="Second").grid(column=4, row=1)
+
+        # time labels for hh:mm:ss
+        self.timer_hour_lbl = tk.Label(master=self.timer_frame, text="00").grid(column=0, row=2)
+        self.h_m_div_lbl = tk.Label(master=self.timer_frame, text=":").grid(column=1, row=2)
+        self.timer_minute_lbl = tk.Label(master=self.timer_frame, text="00").grid(column=2, row=2)
+        self.m_s_div_lbl = tk.Label(master=self.timer_frame, text=":").grid(column=3, row=2)
+        self.timer_second_lbl = tk.Label(master=self.timer_frame, text="00").grid(column=4, row=2)
+
+        # bottom button row for hh:mm:ss
+        self.dec_hour = tk.Button(master=self.timer_frame).grid(column=0, row=3) # dec -> decrease
+        self.dec_minute = tk.Button(master=self.timer_frame).grid(column=2, row=3)
+        self.dec_second = tk.Button(master=self.timer_frame).grid(column=4, row=3)
         
+        # start button
+        self.start_btn = tk.Button(master=container)
+
 if __name__ == "__main__":
     app = tk.Tk()
     DigitalClockFrame(app)
