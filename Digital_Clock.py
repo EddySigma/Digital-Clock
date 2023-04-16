@@ -200,31 +200,65 @@ class Timer(tk.Frame):
         self.clock_font = "Arial" # placeholder
         self.time_font_size = 28
 
+        # variable to hold time
+        self.time = TimeTracker
+
         # holder for everything
-        self.timer_frame = tk.Frame(master=container, bg="blue")
+        self.timer_frame = tk.Frame(master=container)
         self.timer_frame.pack(fill=tk.BOTH, side=tk.LEFT, expand=True)
         self.timer_frame.pack_propagate(False)
+
         self.timer_frame.columnconfigure([0,2,4], weight=3)
         self.timer_frame.columnconfigure(5, weight=2)
-        self.timer_frame.rowconfigure(0, weight=1)
+
+        self.timer_frame.rowconfigure([0,2], weight=1)
+        self.timer_frame.rowconfigure(1, weight=3)
+
+
+        """
+        Note: sticky uses n-e-s-w as in north, east, south and west. They indicate
+        in what direction the item (in this case a button) will stick to think of
+        it as a number pad where the bottom left is 1 and top right is 9 (like a 
+        keyboard) n=8,e=6,s=2,2=4. They can be combined too such as ne=9,se=3 etc.
+        Other important combinations are ew => stick from left to right and ns =>
+        stick from top to bottom and nesw => stick to everything around
+        """
 
         # top row of buttons to increase time in h/m/s
-        self.inc_hour = tk.Button(master=self.timer_frame, text='\u23F6').grid(column=0, row=0, sticky='nesw') # inc -> increase
-        self.inc_minute = tk.Button(master=self.timer_frame, text='\u23F6').grid(column=2, row=0, sticky='nesw')
-        self.inc_second = tk.Button(master=self.timer_frame, text='\u23F6').grid(column=4, row=0, sticky='nesw')
+        self.inc_hour = tk.Button( # inc -> increase
+            master=self.timer_frame,
+            text='\u23F6', # '\u23F6' special character triangle pointing up
+            command=self.time.inc_hour) 
+        self.inc_hour.grid(
+            column=0, 
+            row=0, 
+            sticky='nesw')
+        
+        self.inc_minute = tk.Button(
+            master=self.timer_frame,
+            text='\u23F6', 
+            command=self.time.inc_minute)
+        self.inc_minute.grid(
+            column=2, 
+            row=0, 
+            sticky='nesw')
+        
+        self.inc_second = tk.Button(
+            master=self.timer_frame, 
+            text='\u23F6',
+            command=self.time.inc_second)
+        self.inc_second.grid(
+            column=4, 
+            row=0, 
+            sticky='nesw')
 
         # label row to inform user of hh:mm:ss
-        # can I ignore this and make it so that on hover the label appears instead?
-        """
-        self.hour_lbl = tk.Label(master=self.timer_frame, text="Hour").grid(column=0, row=1)
-        self.minute_lbl = tk.Label(master=self.timer_frame, text="Minute").grid(column=2, row=1)
-        self.second_lbl = tk.Label(master=self.timer_frame, text="Second").grid(column=4, row=1)
-        """
+        # TODO: look into using hints to display what these are... Why?... Why Not?
 
         # time labels for hh:mm:ss
         self.timer_hour_lbl = tk.Label(
             master=self.timer_frame, 
-            text="00", 
+            text=self.time.get_hours, 
             font=(self.clock_font, self.time_font_size))
         self.timer_hour_lbl.grid(column=0, row=1)
 
@@ -236,7 +270,7 @@ class Timer(tk.Frame):
 
         self.timer_minute_lbl = tk.Label(
             master=self.timer_frame, 
-            text="00", 
+            text=self.time.get_minutes, 
             font=(self.clock_font, self.time_font_size))
         self.timer_minute_lbl.grid(column=2, row=1)
 
@@ -248,36 +282,113 @@ class Timer(tk.Frame):
 
         self.timer_second_lbl = tk.Label(
             master=self.timer_frame, 
-            text="00", 
+            text=self.time.get_seconds, 
             font=(self.clock_font, self.time_font_size))
         self.timer_second_lbl.grid(column=4, row=1)
 
 
         # bottom button row for hh:mm:ss
-        self.dec_hour = tk.Button(master=self.timer_frame, text='\u23F7')
+        self.dec_hour = tk.Button(
+            master=self.timer_frame, 
+            text='\u23F7',  # '\u23F7' special character triangle pointing down
+            command=self.time.dec_hour)
         self.dec_hour.grid(column=0, row=2, sticky='nesw') # dec -> decrease
 
-        self.dec_minute = tk.Button(master=self.timer_frame, text='\u23F7')
-        self.dec_minute.grid(column=2, row=2, sticky='nesw') # nesw = take all space in the cell
+        self.dec_minute = tk.Button(
+            master=self.timer_frame, 
+            text='\u23F7',
+            command=self.time.dec_minute)
+        self.dec_minute.grid(column=2, row=2, sticky='nesw')
 
-        self.dec_second = tk.Button(master=self.timer_frame, text='\u23F7')
+        self.dec_second = tk.Button(
+            master=self.timer_frame, 
+            text='\u23F7', 
+            command=self.time.dec_second)
         self.dec_second.grid(column=4, row=2, sticky='nesw')
         
         # control buttons area
         
-        self.control_btns_frame = tk.Frame(master=self.timer_frame, bg="yellow")
+        self.control_btns_frame = tk.Frame(master=self.timer_frame)
         self.control_btns_frame.grid(column=5, row=0, rowspan=3, sticky="ew")
         self.control_btns_frame.columnconfigure(0, weight=1)
         
         # buttons
-        self.start_btn = tk.Button(master=self.control_btns_frame, text="Start")
+        self.start_btn = tk.Button(
+            master=self.control_btns_frame, 
+            text="Start",
+            command=self.start_click)
         self.start_btn.grid(column=0, row=0, sticky="ew")
 
-        self.stop_btn = tk.Button(master=self.control_btns_frame, text="Stop")
+        self.stop_btn = tk.Button(
+            master=self.control_btns_frame,
+            text="Stop",
+            command=self.stop_click)
         self.stop_btn.grid(column=0, row=1, sticky="ew")
 
-        self.clear_btn = tk.Button(master=self.control_btns_frame, text="Clear")
+        self.clear_btn = tk.Button(
+            master=self.control_btns_frame, 
+            text="Clear",
+            command=self.clear_click)
         self.clear_btn.grid(column=0, row=2, sticky="ew")
+    
+    # ===== actions for the control buttons for the timer =====
+    def start_click(self):
+        self.start_btn['state'] = 'disabled'
+        self.stop_btn['state'] = 'normal'
+        self.clear_btn['state'] = 'normal'
+        return 0
+    
+    def stop_click(self):
+        self.start_btn['state'] = 'normal'
+        self.stop_btn['state'] = 'disabled'
+        return 0
+    
+    def clear_click(self):
+        self.start_btn['state'] = 'normal'
+        self.stop_btn['state'] = 'disabled'
+        self.clear_btn['state'] = 'disabled'
+        return 0
+    
+class TimeTracker():
+    second = 1
+    minute = 60 * second
+    hour = 60 * minute # in seconds
+    day = 24 * hour # in seconds
+
+    time = max(0, min(time, day - 1))
+
+    def inc_second(self):
+        self.time += self.second
+        if(self.time == self.day):
+            self.time = 0
+
+    def dec_second(self):
+        self.time -= self.second
+        if (self.time < 0):
+            self.time = self.day -1
+    
+    def inc_minute(self):
+        self.time += self.minute
+
+    def dec_minute(self):
+        self.time -= self.minute
+    
+    def inc_hour(self):
+        self.time += self.hour
+
+    def dec_hour(self):
+        self.time -= self.hour
+
+    def get_hours(self):
+        return self.time / self.hour
+    
+    def get_minutes(self):
+        current_minutes = self.time % self.hour
+        return current_minutes / self.minute
+    
+    def get_seconds(self):
+        return self.time % self.minute
+
 
 if __name__ == "__main__":
     app = tk.Tk()
