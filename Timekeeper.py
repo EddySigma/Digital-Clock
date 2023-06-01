@@ -24,38 +24,45 @@ class Timekeeper():
     # has the value for time exeded the max? # overflow
     def check_overflow(self):
         if self.time >= self.day:
-            self.time %= self.day
+            self.time = self.time % self.day
     
     # has the value for time gone below zero? # underflow
     def check_underflow(self):
         if self.time < 0:
-            self.time = self.day - self.time
+            self.time = self.day + self.time
+            
 
 
     def inc_second(self):
         self.time += self.second
         self.check_overflow()
+        print(self.time)
     
     def inc_minute(self):
         self.time += self.minute
         self.check_overflow()
+        print(self.time)
     
     def inc_hour(self):
         self.time += self.hour
         self.check_overflow()
+        print(self.time)
 
 
     def dec_second(self):
         self.time -= self.second
         self.check_underflow()
+        print(self.time)
 
     def dec_minute(self):
         self.time -= self.minute
         self.check_underflow()
+        print(self.time)
 
     def dec_hour(self):
         self.time -= self.hour
         self.check_underflow()
+        print(self.time)
 
 
     def get_seconds(self):
